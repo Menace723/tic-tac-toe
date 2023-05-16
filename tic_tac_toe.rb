@@ -4,6 +4,7 @@ class TicTacToe
         @board = Array.new(9, ' ')
         @current_player = 'X'
         @players = {}
+        @scores = { 'X' => 0, 'O' => 0}
     end
 
     #board method and displays 
@@ -58,30 +59,61 @@ class TicTacToe
     
         nil 
     end 
+
+    #keeping scores
+    def update_scores(winner)
+        @scores[winner] += 1 if winner
+    end
+
+    #display of scores
+    def display_scores
+        puts "Current Scores:"
+        @scores.each { |player, score| puts "#{@players[player]}: #{score}"}
+    end
     
     #handles game loop and displays the result
     def play 
         get_player_names
     
-        loop do 
-            draw_board
-            get_move
-            result = game_over
-    
-            if result
+        loop do
+            loop do 
                 draw_board
-                if result == 'DRAW'
-                    puts "It's a draw!"
-                else 
-                    puts "#{@players[@current_player]} wins!"
-                end
-                break
-            end 
-    
-            switch_player
+                get_move
+                result = game_over
+        
+                if result
+                    draw_board
+                    if result == 'DRAW'
+                        puts "It's a draw!"
+                    else 
+                        puts "#{@players[@current_player]} wins!"
+                        update_scores(@current_player)
+                    end
+                    display_scores
+                    break
+                end 
+        
+                switch_player
+            end
+            
+            puts "Do you want to play again? (Y/N)"
+            play_again = gets.chomp.downcase
+
+            break unless play_again == 'y'
+
+            reset_game
         end
+
+        puts "Thank you for playing!"
+
     end
-    
+
+    #reseting the game
+    def reset_game
+        @board = Array.new(9, ' ')
+        @current_player = 'X'
+    end
+
     private
     
     #contains possible winning lines on the board
